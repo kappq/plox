@@ -1,4 +1,3 @@
-from curses.ascii import isdigit
 from lox import Lox
 from tokens import TokenType, Token
 
@@ -95,7 +94,7 @@ class Scanner:
             case '"':
                 self.string()
             case _:
-                if isdigit(char):
+                if char.isdigit():
                     self.number()
                 elif char.isalpha():
                     self.identifier()
@@ -151,12 +150,12 @@ class Scanner:
         self.add_token(TokenType.STRING, value)
 
     def number(self) -> None:
-        while isdigit(self.peek()):
+        while self.peek().isdigit():
             self.advance()
 
-        if self.peek() == "." and isdigit(self.peek_next()):
+        if self.peek() == "." and self.peek_next().isdigit():
             self.advance()
-            while isdigit(self.peek()):
+            while self.peek().isdigit():
                 self.advance()
 
         self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
