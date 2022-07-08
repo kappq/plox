@@ -165,7 +165,7 @@ class Scanner:
         while self.peek().isalnum():
             self.advance()
 
-        text = self.source[self.start:self.current]
+        text = self.source[self.start : self.current]
         type = TokenType(text) if text in Scanner.keywords else TokenType.IDENTIFIER
 
         self.add_token(type)
