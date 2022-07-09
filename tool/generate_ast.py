@@ -43,7 +43,7 @@ class GenerateAst:
             file.write(INDENTATION + "@abstractmethod")
             file.write(NEWLINE)
             file.write(
-                INDENTATION + f"def accept(self, visitor: {base_name}Visitor) -> None:"
+                INDENTATION + f"def accept(self, visitor: {base_name}Visitor) -> Any:"
             )
             file.write(NEWLINE)
             file.write(INDENTATION * 2 + "pass")
@@ -71,7 +71,7 @@ class GenerateAst:
 
         file.write(NEWLINE)
         file.write(
-            INDENTATION + f"def accept(self, visitor: {base_name}Visitor) -> None:"
+            INDENTATION + f"def accept(self, visitor: {base_name}Visitor) -> Any:"
         )
         file.write(NEWLINE)
         file.write(
@@ -93,7 +93,7 @@ class GenerateAst:
             file.write(NEWLINE)
             file.write(
                 INDENTATION
-                + f"def visit_{type_name.lower()}_{name.lower()}(self, {name.lower()}: {type_name}) -> None:"
+                + f"def visit_{type_name.lower()}_{name.lower()}(self, {name.lower()}: {type_name}) -> Any:"
             )
             file.write(NEWLINE)
             file.write(INDENTATION * 2 + "pass")
