@@ -28,12 +28,16 @@ class Lox:
 
     @staticmethod
     def run_prompt() -> None:
-        while True:
-            line = input("> ")
-            if line is None:
-                break
-            Lox.run(line)
-            Lox.had_error = False
+        try:
+            while True:
+                line = input("> ")
+                if line is None:
+                    break
+                Lox.run(line)
+                Lox.had_error = False
+        except KeyboardInterrupt:
+            print()
+            print('Bye...')
 
     @staticmethod
     def run(source: str) -> None:
