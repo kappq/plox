@@ -1,11 +1,11 @@
 import sys
 from tokens import TokenType, Token
-from ast_printer import AstPrinter
 from typing import Optional
 
 
 class Lox:
     had_error = False
+    had_runtime_error = False
 
     @staticmethod
     def main() -> None:
@@ -25,6 +25,8 @@ class Lox:
 
             if Lox.had_error:
                 exit(65)
+            if Lox.had_runtime_error:
+                exit(70)
 
     @staticmethod
     def run_prompt() -> None:
@@ -37,7 +39,7 @@ class Lox:
                 Lox.had_error = False
         except KeyboardInterrupt:
             print()
-            print('Bye...')
+            print("Bye...")
 
     @staticmethod
     def run(source: str) -> None:
@@ -54,7 +56,10 @@ class Lox:
         if not expression:
             return
 
-        print(AstPrinter().print(expression))
+        from interpreter import Interpreter
+
+        interpreter = Interpreter()
+        interpreter.interpret(expression)
 
     @staticmethod
     def error(line: int, message: str, token: Optional[Token] = None) -> None:
@@ -66,6 +71,11 @@ class Lox:
             return
 
         Lox.report(line, "", message)
+
+    @staticmethod
+    def runtime_error(line: int, message: str) -> None:
+        print(f"[line {line}] Error: {message}")
+        Lox.had_runtime_error = True
 
     @staticmethod
     def report(line: int, where: str, message: str) -> None:
