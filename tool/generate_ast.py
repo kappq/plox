@@ -30,13 +30,13 @@ class GenerateAst:
         path = f"{output_dir}/{base_name.lower()}.py"
 
         with open(path, "w") as file:
+            file.write("from __future__ import annotations")
+            file.write(NEWLINE)
             file.write("from abc import ABC, abstractmethod")
             file.write(NEWLINE)
             file.write("from typing import Any")
             file.write(NEWLINE)
             file.write("from tokens import Token")
-            file.write(NEWLINE)
-            file.write("from __future__ import annotations")
             file.write(NEWLINE * 3)
             file.write(f"class {base_name}(ABC):")
             file.write(NEWLINE)
