@@ -99,7 +99,7 @@ class Scanner:
                 elif char.isalpha():
                     self.identifier()
                 else:
-                    Lox.error(self.line, f"Unexpected character {char!r}")
+                    Lox.error(self.line, f"unexpected character {char!r}")
 
     def is_at_end(self) -> bool:
         return self.current >= len(self.source)
@@ -142,7 +142,8 @@ class Scanner:
             self.advance()
 
         if self.is_at_end():
-            Lox.error(self.line, "Unterminated string")
+            Lox.error(self.line, "unterminated string")
+            return
 
         self.advance()
 

@@ -1,4 +1,7 @@
 import sys
+from tokens import TokenType, Token
+from ast_printer import AstPrinter
+from typing import Optional
 
 
 class Lox:
@@ -39,11 +42,25 @@ class Lox:
         scanner = Scanner(source)
         tokens = scanner.scan_tokens()
 
-        for token in tokens:
-            print(token)
+        from parser import Parser
+
+        parser = Parser(tokens)
+        expression = parser.parse()
+
+        if not expression:
+            return
+
+        print(AstPrinter().print(expression))
 
     @staticmethod
-    def error(line: int, message: str) -> None:
+    def error(line: int, message: str, token: Optional[Token] = None) -> None:
+        if token:
+            if token.type == TokenType.EOF:
+                Lox.report(token.line, " at end", message)
+            else:
+                Lox.report(token.line, f" at {token.lexeme!r}", message)
+            return
+
         Lox.report(line, "", message)
 
     @staticmethod
