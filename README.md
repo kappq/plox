@@ -22,4 +22,4 @@ python lox.py [script]
 where `[script]` is the optional path to a `.lox` file. If the path isn't specified the interpreter will run in prompt mode.
 
 ## Additional Information
-All the files will be type checked with `mypy` in `--strict` mode.
+All the files are formatted with `black` and type checked with `mypy` in `--strict` mode.
