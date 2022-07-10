@@ -1,6 +1,6 @@
-from typing import Optional
 from tokens import Token, TokenType
 from expr import Expr, Binary, Literal, Unary, Grouping
+from stmt import Stmt, Print, Expression
 from lox import Lox
 
 
@@ -73,14 +73,31 @@ class Parser:
 
         raise self.error(self.peek(), message)
 
-    def parse(self) -> Optional[Expr]:
-        try:
-            return self.expression()
-        except ParseError:
-            return None
+    def parse(self) -> list[Stmt]:
+        statements = []
+        while not self.is_at_end():
+            statements.append(self.statement())
+
+        return statements
 
     def expression(self) -> Expr:
         return self.equality()
+
+    def statement(self) -> Stmt:
+        if self.match(TokenType.PRINT):
+            return self.print_statement()
+
+        return self.expression_statement()
+
+    def print_statement(self) -> Stmt:
+        value = self.expression()
+        self.consume(TokenType.SEMICOLON, "expect ';' after value")
+        return Print(value)
+
+    def expression_statement(self) -> Stmt:
+        expr = self.expression()
+        self.consume(TokenType.SEMICOLON, "expect ';' after expression")
+        return Expression(expr)
 
     def equality(self) -> Expr:
         expr = self.comparison()

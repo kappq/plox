@@ -1,4 +1,5 @@
 from expr import Expr, ExprVisitor, Literal, Grouping, Unary, Binary
+from stmt import Stmt, StmtVisitor, Expression, Print
 from tokens import TokenType, Token
 from lox import Lox
 from typing import Any
@@ -10,16 +11,26 @@ class InterpretError(RuntimeError):
         self.message = message
 
 
-class Interpreter(ExprVisitor):
-    def interpret(self, expression: Expr) -> None:
+class Interpreter(ExprVisitor, StmtVisitor):
+    def interpret(self, statements: list[Stmt]) -> None:
         try:
-            value = self.evaluate(expression)
-            print(self.stringify(value))
+            for statement in statements:
+                self.execute(statement)
         except InterpretError as error:
             Lox.runtime_error(error.token.line, error.message)
 
     def evaluate(self, expr: Expr) -> Any:
         return expr.accept(self)
+
+    def execute(self, stmt: Stmt) -> Any:
+        stmt.accept(self)
+
+    def visit_expression_stmt(self, stmt: Expression) -> Any:
+        self.evaluate(stmt.expression)
+
+    def visit_print_stmt(self, stmt: Print) -> Any:
+        value = self.evaluate(stmt.expression)
+        print(self.stringify(value))
 
     def visit_literal_expr(self, expr: Literal) -> Any:
         return expr.value

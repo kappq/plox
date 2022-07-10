@@ -51,15 +51,15 @@ class Lox:
         from parser import Parser
 
         parser = Parser(tokens)
-        expression = parser.parse()
+        statements = parser.parse()
 
-        if not expression:
+        if not statements:
             return
 
         from interpreter import Interpreter
 
         interpreter = Interpreter()
-        interpreter.interpret(expression)
+        interpreter.interpret(statements)
 
     @staticmethod
     def error(line: int, message: str, token: Optional[Token] = None) -> None:
