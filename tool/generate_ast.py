@@ -14,6 +14,7 @@ class GenerateAst:
             print("Usage: generate_ast <output directory>")
             exit(64)
         output_dir = args[0]
+
         GenerateAst.define_ast(
             output_dir,
             "Expr",
@@ -23,10 +24,22 @@ class GenerateAst:
                 "Literal": "value: Any",
                 "Unary": "operator: Token, right: Expr",
             },
+            ["from tokens import Token"],
+        )
+        GenerateAst.define_ast(
+            output_dir,
+            "Stmt",
+            {
+                "Expression": "expression: Expr",
+                "Print": "expression: Expr",
+            },
+            ["from expr import Expr"],
         )
 
     @staticmethod
-    def define_ast(output_dir: str, base_name: str, types: dict[str, str]) -> None:
+    def define_ast(
+        output_dir: str, base_name: str, types: dict[str, str], imports: list[str]
+    ) -> None:
         path = f"{output_dir}/{base_name.lower()}.py"
 
         with open(path, "w") as file:
@@ -35,8 +48,11 @@ class GenerateAst:
             file.write("from abc import ABC, abstractmethod")
             file.write(NEWLINE)
             file.write("from typing import Any")
-            file.write(NEWLINE)
-            file.write("from tokens import Token")
+
+            for imp in imports:
+                file.write(NEWLINE)
+                file.write(imp)
+
             file.write(NEWLINE * 3)
             file.write(f"class {base_name}(ABC):")
             file.write(NEWLINE)
