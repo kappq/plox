@@ -1,6 +1,8 @@
 import sys
-from tokens import TokenType, Token
 from typing import Optional
+
+from errors import LoxRuntimeError
+from tokens import TokenType, Token
 
 
 class Lox:
@@ -73,14 +75,15 @@ class Lox:
         Lox.report(line, "", message)
 
     @staticmethod
-    def runtime_error(line: int, message: str) -> None:
-        print(f"[line {line}] Error: {message}")
-        Lox.had_runtime_error = True
-
-    @staticmethod
     def report(line: int, where: str, message: str) -> None:
         print(f"[line {line}] Error{where}: {message}")
         Lox.had_error = True
+
+    @staticmethod
+    def runtime_error(error: LoxRuntimeError) -> None:
+        print(error.message)
+        print(f"[line {error.token.line}]")
+        Lox.had_runtime_error = True
 
 
 if __name__ == "__main__":

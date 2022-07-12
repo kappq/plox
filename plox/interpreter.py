@@ -1,29 +1,42 @@
-from expr import Expr, ExprVisitor, Literal, Grouping, Unary, Binary
-from stmt import Stmt, StmtVisitor, Expression, Print
-from tokens import TokenType, Token
-from lox import Lox
 from typing import Any
 
-
-class InterpretError(RuntimeError):
-    def __init__(self, token: Token, message: str) -> None:
-        self.token = token
-        self.message = message
+from environment import Environment
+from errors import LoxRuntimeError
+from expr import Assign, Binary, Expr, ExprVisitor, Grouping, Literal, Unary, Variable
+from lox import Lox
+from stmt import Block, Expression, Print, Stmt, StmtVisitor, Var
+from tokens import Token, TokenType
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
+    def __init__(self) -> None:
+        self.environment = Environment()
+
     def interpret(self, statements: list[Stmt]) -> None:
         try:
             for statement in statements:
                 self.execute(statement)
-        except InterpretError as error:
-            Lox.runtime_error(error.token.line, error.message)
+        except LoxRuntimeError as error:
+            Lox.runtime_error(error)
 
     def evaluate(self, expr: Expr) -> Any:
         return expr.accept(self)
 
     def execute(self, stmt: Stmt) -> Any:
         stmt.accept(self)
+
+    def execute_block(self, statements: list[Stmt], environment: Environment) -> None:
+        previous = self.environment
+        try:
+            self.environment = environment
+
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self.environment = previous
+
+    def visit_block_stmt(self, stmt: Block) -> Any:
+        self.execute_block(stmt.statements, Environment(self.environment))
 
     def visit_expression_stmt(self, stmt: Expression) -> Any:
         self.evaluate(stmt.expression)
@@ -32,23 +45,17 @@ class Interpreter(ExprVisitor, StmtVisitor):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
 
-    def visit_literal_expr(self, expr: Literal) -> Any:
-        return expr.value
+    def visit_var_stmt(self, stmt: Var) -> Any:
+        value = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
 
-    def visit_grouping_expr(self, expr: Grouping) -> Any:
-        return self.evaluate(expr.expression)
+        self.environment.define(stmt.name.lexeme, value)
 
-    def visit_unary_expr(self, expr: Unary) -> Any:
-        right = self.evaluate(expr.right)
-
-        match expr.operator.type:
-            case TokenType.MINUS:
-                self.check_number_operand(expr.operator, right)
-                return -right
-            case TokenType.BANG:
-                return not self.is_truthy(right)
-
-        return None
+    def visit_assign_expr(self, expr: Assign) -> Any:
+        value = self.evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
 
     def visit_binary_expr(self, expr: Binary) -> Any:
         left = self.evaluate(expr.left)
@@ -69,7 +76,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
                     return left + right
                 if isinstance(left, str) and isinstance(right, str):
                     return left + right
-                raise InterpretError(
+                raise LoxRuntimeError(
                     expr.operator, "operands must be two numbers or two strings"
                 )
             case TokenType.GREATER:
@@ -89,6 +96,39 @@ class Interpreter(ExprVisitor, StmtVisitor):
             case TokenType.EQUAL_EQUAL:
                 return self.is_equal(left, right)
 
+    def visit_grouping_expr(self, expr: Grouping) -> Any:
+        return self.evaluate(expr.expression)
+
+    def visit_literal_expr(self, expr: Literal) -> Any:
+        return expr.value
+
+    def visit_unary_expr(self, expr: Unary) -> Any:
+        right = self.evaluate(expr.right)
+
+        match expr.operator.type:
+            case TokenType.MINUS:
+                self.check_number_operand(expr.operator, right)
+                return -right
+            case TokenType.BANG:
+                return not self.is_truthy(right)
+
+        return None
+
+    def visit_variable_expr(self, expr: Variable) -> Any:
+        return self.environment.get(expr.name)
+
+    def check_number_operand(self, operator: Token, operand: Any) -> None:
+        if isinstance(operand, float):
+            return
+
+        raise LoxRuntimeError(operator, "operand must be a number")
+
+    def check_number_operands(self, operator: Token, left: Any, right: Any) -> None:
+        if isinstance(left, float) and isinstance(right, float):
+            return
+
+        raise LoxRuntimeError(operator, "operands must be a number")
+
     def is_truthy(self, value: Any) -> bool:
         if value is None:
             return False
@@ -100,18 +140,6 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def is_equal(self, a: Any, b: Any) -> bool:
         return bool(a == b)
-
-    def check_number_operand(self, operator: Token, operand: Any) -> None:
-        if isinstance(operand, float):
-            return
-
-        raise InterpretError(operator, "operand must be a number")
-
-    def check_number_operands(self, operator: Token, left: Any, right: Any) -> None:
-        if isinstance(left, float) and isinstance(right, float):
-            return
-
-        raise InterpretError(operator, "operands must be a number")
 
     def stringify(self, value: Any) -> str:
         if value is None:

@@ -19,10 +19,12 @@ class GenerateAst:
             output_dir,
             "Expr",
             {
+                "Assign": "name: Token, value: Expr",
                 "Binary": "left: Expr, operator: Token, right: Expr",
                 "Grouping": "expression: Expr",
                 "Literal": "value: Any",
                 "Unary": "operator: Token, right: Expr",
+                "Variable": "name: Token",
             },
             ["from tokens import Token"],
         )
@@ -30,10 +32,16 @@ class GenerateAst:
             output_dir,
             "Stmt",
             {
+                "Block": "statements: list[Stmt]",
                 "Expression": "expression: Expr",
                 "Print": "expression: Expr",
+                "Var": "name: Token, initializer: Optional[Expr]",
             },
-            ["from expr import Expr"],
+            [
+                "from expr import Expr",
+                "from tokens import Token",
+                "from typing import Optional",
+            ],
         )
 
     @staticmethod
