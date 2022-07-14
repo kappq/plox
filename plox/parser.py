@@ -1,7 +1,7 @@
 from typing import Optional
 
 from errors import ParseError
-from expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
+from expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox import Lox
 from stmt import Block, Expression, If, Print, Stmt, Var
 from tokens import Token, TokenType
@@ -88,7 +88,7 @@ class Parser:
         return Block(statements)
 
     def assignment(self) -> Expr:
-        expr = self.equality()
+        expr = self.logical_or()
 
         if self.match(TokenType.EQUAL):
             equals = self.previous()
@@ -99,6 +99,26 @@ class Parser:
                 return Assign(name, value)
 
             self.error(equals, "invalid assignment target")
+
+        return expr
+
+    def logical_or(self) -> Expr:
+        expr = self.logical_and()
+
+        while self.match(TokenType.OR):
+            operator = self.previous()
+            right = self.logical_and()
+            expr = Logical(expr, operator, right)
+
+        return expr
+
+    def logical_and(self) -> Expr:
+        expr = self.equality()
+
+        while self.match(TokenType.AND):
+            operator = self.previous()
+            right = self.equality()
+            expr = Logical(expr, operator, right)
 
         return expr
 

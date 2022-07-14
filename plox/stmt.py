@@ -2,9 +2,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
+from typing import Optional
 from expr import Expr
 from tokens import Token
-from typing import Optional
 
 
 class Stmt(ABC):

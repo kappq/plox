@@ -23,6 +23,7 @@ class GenerateAst:
                 "Binary": "left: Expr, operator: Token, right: Expr",
                 "Grouping": "expression: Expr",
                 "Literal": "value: Any",
+                "Logical": "left: Expr, operator: Token, right: Expr",
                 "Unary": "operator: Token, right: Expr",
                 "Variable": "name: Token",
             },
@@ -39,9 +40,9 @@ class GenerateAst:
                 "Var": "name: Token, initializer: Optional[Expr]",
             },
             [
+                "from typing import Optional",
                 "from expr import Expr",
                 "from tokens import Token",
-                "from typing import Optional",
             ],
         )
 
