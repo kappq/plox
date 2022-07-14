@@ -4,7 +4,7 @@ from environment import Environment
 from errors import LoxRuntimeError
 from expr import Assign, Binary, Expr, ExprVisitor, Grouping, Literal, Logical, Unary, Variable
 from lox import Lox
-from stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var
+from stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var, While
 from tokens import Token, TokenType
 
 
@@ -57,6 +57,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
             value = self.evaluate(stmt.initializer)
 
         self.environment.define(stmt.name.lexeme, value)
+
+    def visit_while_stmt(self, stmt: While) -> Any:
+        while self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.body)
 
     def visit_assign_expr(self, expr: Assign) -> Any:
         value = self.evaluate(expr.value)
@@ -119,7 +123,6 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 return left
 
         return self.evaluate(expr.right)
-
 
     def visit_unary_expr(self, expr: Unary) -> Any:
         right = self.evaluate(expr.right)

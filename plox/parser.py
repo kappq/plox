@@ -1,7 +1,7 @@
 from errors import ParseError
 from expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox import Lox
-from stmt import Block, Expression, If, Print, Stmt, Var
+from stmt import Block, Expression, If, Print, Stmt, Var, While
 from tokens import Token, TokenType
 
 
@@ -37,6 +37,8 @@ class Parser:
             return self.if_statement()
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        if self.match(TokenType.WHILE):
+            return self.while_statement()
         if self.match(TokenType.LEFT_BRACE):
             return self.block()
 
@@ -45,7 +47,7 @@ class Parser:
     def if_statement(self) -> Stmt:
         self.consume(TokenType.LEFT_PAREN, "expect '(' after 'if'")
         condition = self.expression()
-        self.consume(TokenType.RIGHT_PAREN, "expect ')' after if condition")
+        self.consume(TokenType.RIGHT_PAREN, "expect ')' after condition")
 
         then_branch = self.statement()
         else_branch = None
@@ -68,6 +70,14 @@ class Parser:
 
         self.consume(TokenType.SEMICOLON, "expect ';' after variable declaration")
         return Var(name, initializer)
+
+    def while_statement(self) -> Stmt:
+        self.consume(TokenType.LEFT_PAREN, "expect '(' after 'while'")
+        condition = self.expression()
+        self.consume(TokenType.RIGHT_PAREN, "expect ')' after condition")
+        body = self.statement()
+
+        return While(condition, body)
 
     def expression_statement(self) -> Stmt:
         expr = self.expression()
