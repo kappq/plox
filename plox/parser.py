@@ -1,5 +1,3 @@
-from typing import Optional
-
 from errors import ParseError
 from expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox import Lox
@@ -24,7 +22,7 @@ class Parser:
     def expression(self) -> Expr:
         return self.assignment()
 
-    def declaration(self) -> Optional[Stmt]:
+    def declaration(self) -> Stmt | None:
         try:
             if self.match(TokenType.VAR):
                 return self.var_declaration()

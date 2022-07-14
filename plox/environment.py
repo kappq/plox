@@ -1,12 +1,12 @@
 from __future__ import annotations
-from typing import Any, Optional
+from typing import Any
 
 from tokens import Token
 from errors import LoxRuntimeError
 
 
 class Environment:
-    def __init__(self, enclosing: Optional[Environment] = None) -> None:
+    def __init__(self, enclosing: Environment | None = None) -> None:
         self.values: dict[str, Any] = {}
         self.enclosing = enclosing
 

@@ -1,5 +1,4 @@
 import sys
-from typing import Optional
 
 from errors import LoxRuntimeError
 from tokens import TokenType, Token
@@ -64,7 +63,7 @@ class Lox:
         interpreter.interpret(statements)
 
     @staticmethod
-    def error(line: int, message: str, token: Optional[Token] = None) -> None:
+    def error(line: int, message: str, token: Token | None = None) -> None:
         if token:
             if token.type == TokenType.EOF:
                 Lox.report(token.line, " at end", message)
