@@ -2,7 +2,17 @@ from typing import Any
 
 from environment import Environment
 from errors import LoxRuntimeError
-from expr import Assign, Binary, Expr, ExprVisitor, Grouping, Literal, Logical, Unary, Variable
+from expr import (
+    Assign,
+    Binary,
+    Expr,
+    ExprVisitor,
+    Grouping,
+    Literal,
+    Logical,
+    Unary,
+    Variable,
+)
 from lox import Lox
 from stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var, While
 from tokens import Token, TokenType
