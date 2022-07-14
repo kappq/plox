@@ -101,7 +101,7 @@ class Scanner:
                     Lox.error(self.line, f"unexpected character {char!r}")
 
     def identifier(self) -> None:
-        while self.peek().isalnum():
+        while self.peek().isalnum() or self.peek() == '_':
             self.advance()
 
         text = self.source[self.start : self.current]
