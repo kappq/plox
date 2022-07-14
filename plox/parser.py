@@ -3,7 +3,7 @@ from typing import Optional
 from errors import ParseError
 from expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
 from lox import Lox
-from stmt import Block, Expression, Print, Stmt, Var
+from stmt import Block, Expression, If, Print, Stmt, Var
 from tokens import Token, TokenType
 
 
@@ -35,12 +35,26 @@ class Parser:
             return None
 
     def statement(self) -> Stmt:
+        if self.match(TokenType.IF):
+            return self.if_statement()
         if self.match(TokenType.PRINT):
             return self.print_statement()
         if self.match(TokenType.LEFT_BRACE):
             return self.block()
 
         return self.expression_statement()
+
+    def if_statement(self) -> Stmt:
+        self.consume(TokenType.LEFT_PAREN, "expect '(' after 'if'")
+        condition = self.expression()
+        self.consume(TokenType.RIGHT_PAREN, "expect ')' after if condition")
+
+        then_branch = self.statement()
+        else_branch = None
+        if self.match(TokenType.ELSE):
+            else_branch = self.statement()
+
+        return If(condition, then_branch, else_branch)
 
     def print_statement(self) -> Stmt:
         value = self.expression()

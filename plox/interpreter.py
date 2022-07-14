@@ -4,7 +4,7 @@ from environment import Environment
 from errors import LoxRuntimeError
 from expr import Assign, Binary, Expr, ExprVisitor, Grouping, Literal, Unary, Variable
 from lox import Lox
-from stmt import Block, Expression, Print, Stmt, StmtVisitor, Var
+from stmt import Block, Expression, If, Print, Stmt, StmtVisitor, Var
 from tokens import Token, TokenType
 
 
@@ -40,6 +40,12 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
     def visit_expression_stmt(self, stmt: Expression) -> Any:
         self.evaluate(stmt.expression)
+
+    def visit_if_stmt(self, stmt: If) -> Any:
+        if self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.then_branch)
+        elif stmt.else_branch:
+            self.execute(stmt.else_branch)
 
     def visit_print_stmt(self, stmt: Print) -> Any:
         value = self.evaluate(stmt.expression)
