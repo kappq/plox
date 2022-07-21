@@ -1,4 +1,7 @@
-__pycache__
-.mypy_cache
-.vscode
+# Directories
+__pycache__/
+.mypy_cache/
+.vscode/
+
+# Files
 test.lox
